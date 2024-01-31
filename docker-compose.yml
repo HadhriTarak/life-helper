@@ -1,13 +1,37 @@
-version: '3.8'
+version: '3.9'
 services:
     api-gateway:
+        container_name: api-gateway
         build:
             context: ./applications/api-gateway
+            target: development
             dockerfile: Dockerfile
+        command: pnpm run --filter api-gateway start
+        networks: 
+            - life-helper-app
         ports:
             - 3000:3000
-        networks:
+            - 9229:9229
+        depends_on:
+            - mongoDataBase
+        restart: unless-stopped
+        environment:
+            DB_CONNECTION: mongodb://root:root@localhost:27017/life-helper-db
+
+    mongoDataBase:
+        image: mongo
+        restart: always
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: root
+            MONGO_INITDB_DATABASE: life-helper-db
+        networks: 
             - life-helper-app
+        ports:
+            - '27017:27017'
+        volumes: 
+            - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+            - ./data:/data/life_helper/db
 
 networks:
     life-helper-app:

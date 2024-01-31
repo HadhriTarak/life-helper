@@ -1,8 +1,8 @@
-FROM node:19-alpine As development
+FROM node:19 As development
 
 WORKDIR /usr/src/app
 
-COPY ./package.json .
+COPY ./package*.json .
 
 RUN npm i -g npm@latest; \
  # Install pnpm
@@ -21,4 +21,3 @@ COPY . .
 
 # Build
 RUN pnpm run build
-CMD [ "node", "dist/main.js" ]
